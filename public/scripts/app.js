@@ -49,9 +49,19 @@ const updateCard = async (card) => {
 const kickoff = () => {
   const cards = Array.from(document.querySelectorAll('[data-endpoint]'));
   cards.forEach(updateCard);
-  setInterval(() => cards.forEach(updateCard), 15000);
+  const interval = setInterval(() => cards.forEach(updateCard), 15000);
+  return interval;
 };
 
 if (typeof globalThis !== 'undefined' && globalThis.window) {
   globalThis.window.addEventListener('DOMContentLoaded', kickoff);
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    fallbackMessages,
+    fetchJson,
+    updateCard,
+    kickoff,
+  };
 }
