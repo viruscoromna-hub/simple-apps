@@ -2,10 +2,10 @@
   "name": "simple-apps",
   "version": "1.0.0",
   "description": "Training DevOps Simple Apps",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "dev": "nodemon app",
-    "start": "node app",
+    "dev": "nodemon server.js",
+    "start": "node server.js",
     "test": "jest --forceExit testing/",
     "test:coverage": "jest --forceExit --coverage testing/"
   },

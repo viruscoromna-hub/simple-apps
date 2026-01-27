@@ -23,7 +23,6 @@ const fallbackUsers = [
 ];
 
 const app = express();
-const port = Number(process.env.APP_PORT) || 3000;
 
 app.disable('x-powered-by');
 app.use(
@@ -101,16 +100,6 @@ app.use((error, req, res, _next) => {
   console.error(error);
   res.status(500).json({ message: 'Internal server error' });
 });
-
-const start = () => {
-  app.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
-  });
-};
-
-if (require.main === module) {
-  start();
-}
 
 app.releaseInfo = releaseInfo;
 module.exports = app;

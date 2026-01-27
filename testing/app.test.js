@@ -1,7 +1,5 @@
 const request = require('supertest');
-require('dotenv').config();
-
-const connection = require('../middleware/db_connect');
+const pool = require('../middleware/db_connect');
 const app = require('../app');
 
 describe('UI routes', () => {
@@ -44,16 +42,32 @@ describe('API status metadata', () => {
 });
 
 describe('Users endpoint & error handling', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   afterAll(() => {
-    connection.end();
+    pool.end();
   });
 
   it('falls back when the database is unreachable', async () => {
+    jest.spyOn(pool, 'query').mockImplementation((_sql, callback) =>
+      callback(new Error('db unreachable'))
+    );
     const response = await request(app).get('/users');
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body.length).toBeGreaterThanOrEqual(1);
-    expect(response.body[0]).toHaveProperty('name');
+    expect(response.body[0]).toMatchObject({
+      name: expect.any(String),
+    });
+  });
+
+  it('returns database results when available', async () => {
+    const expected = [{ id: 9, name: 'Unit Tester' }];
+    jest.spyOn(pool, 'query').mockImplementation((_sql, callback) => callback(null, expected));
+    const response = await request(app).get('/users');
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(expected);
   });
 
   it('returns 404 for unknown endpoints', async () => {
@@ -68,4 +82,3 @@ describe('Users endpoint & error handling', () => {
     expect(response.body).toEqual({ message: 'Internal server error' });
   });
 });
-
