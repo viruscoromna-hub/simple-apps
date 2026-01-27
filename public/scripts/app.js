@@ -50,6 +50,6 @@ const kickoff = () => {
   setInterval(() => cards.forEach(updateCard), 15000);
 };
 
-if (typeof window !== 'undefined') {
-  window.addEventListener('DOMContentLoaded', kickoff);
+if (typeof globalThis !== 'undefined' && globalThis.window) {
+  globalThis.window.addEventListener('DOMContentLoaded', kickoff);
 }

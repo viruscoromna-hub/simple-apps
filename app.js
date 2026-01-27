@@ -1,6 +1,6 @@
 const express = require('express');
 const helmet = require('helmet');
-const path = require('path');
+const path = require('node:path');
 require('dotenv').config();
 
 const logger = require('./middleware/logger');
