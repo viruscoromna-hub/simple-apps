@@ -1,13 +1,38 @@
-/**
- * @jest-environment jsdom
- */
+const { JSDOM } = require('jsdom');
 
 describe('frontend script', () => {
+  let dom;
   let scriptModule;
+
+  const setupDom = () => {
+    dom = new JSDOM(
+      '<!DOCTYPE html><body>' +
+        '<article class="api-card" data-endpoint="/app1"><p class="value"></p><p class="note"></p></article>' +
+        '<article class="api-card" data-endpoint="/status"><p class="value"></p><p class="note"></p></article>' +
+        '</body>',
+      { url: 'http://localhost' }
+    );
+    global.window = dom.window;
+    global.document = dom.window.document;
+    global.navigator = dom.window.navigator;
+    globalThis.window = dom.window;
+    globalThis.document = dom.window.document;
+  };
+
+  const teardownDom = () => {
+    if (dom) {
+      dom.window.close();
+    }
+    delete global.window;
+    delete global.document;
+    delete global.navigator;
+    delete globalThis.window;
+    delete globalThis.document;
+  };
 
   beforeEach(() => {
     jest.resetModules();
-    scriptModule = require('../public/scripts/app');
+    setupDom();
     global.fetch = jest.fn().mockImplementation((endpoint) =>
       Promise.resolve({
         ok: true,
@@ -19,23 +44,14 @@ describe('frontend script', () => {
           ),
       })
     );
-    document.body.innerHTML = `
-      <article class="api-card" data-endpoint="/app1">
-        <p class="value"></p>
-        <p class="note"></p>
-      </article>
-      <article class="api-card" data-endpoint="/status">
-        <p class="value"></p>
-        <p class="note"></p>
-      </article>
-    `;
+    scriptModule = require('../public/scripts/app');
   });
 
   afterEach(() => {
     jest.clearAllTimers();
     jest.useRealTimers();
     delete global.fetch;
-    document.body.innerHTML = '';
+    teardownDom();
   });
 
   it('updates cards using fetch results', async () => {
