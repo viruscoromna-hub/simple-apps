@@ -27,6 +27,10 @@
           Aplikasi satu halaman yang mendemonstrasikan arsitektur API ringan, keamanan tingkat produksi, dan gaya
           antarmuka yang sekarang.
         </p>
+        <div class="hero-badges">
+          <span class="hero-pill">Release 1.0.0</span>
+          <span class="hero-pill ghost">Audit ready</span>
+        </div>
         <div class="hero-actions">
           <button class="primary">Jelajah Fitur</button>
           <button class="ghost">Lihat Dokumentasi</button>
@@ -54,12 +58,36 @@
         </article>
         <article>
           <h3>Keamanan</h3>
-          <p>Helmet mengekspos header yang lebih aman dan express menutup kebocoran metadata server.</p>
+          <p>Helmet mengekspos header yang lebih aman dan Express menutup kebocoran metadata server.</p>
         </article>
         <article>
           <h3>Data</h3>
           <p>Pool koneksi menjamin batas koneksi, pemantauan, dan skalabilitas saat Sonar memeriksa resource.</p>
         </article>
+      </section>
+
+      <section class="api-panel">
+        <header>
+          <p class="eyebrow">Ping layer</p>
+          <h2>API Heartbeat</h2>
+        </header>
+        <div class="api-grid">
+          <article class="api-card" data-endpoint="/app1">
+            <p class="label">App 1</p>
+            <p class="value">Menunggu respon…</p>
+            <p class="note">Menjangkau endpoint paling ringan.</p>
+          </article>
+          <article class="api-card" data-endpoint="/app2">
+            <p class="label">App 2</p>
+            <p class="value">Menunggu respon…</p>
+            <p class="note">Respons JSON siap dikonsumsi.</p>
+          </article>
+          <article class="api-card status-card" data-endpoint="/status">
+            <p class="label">Status</p>
+            <p class="value">Sedang memeriksa…</p>
+            <p class="note">Uptime & versi nanti muncul di sini.</p>
+          </article>
+        </div>
       </section>
 
       <section class="panel-grid">
@@ -73,21 +101,23 @@
         <article>
           <h4>Pipeline</h4>
           <p>
-            Rute API kecil namun terdefinisi (app1, app2, users) membuat deployment otomatis tetap ringan dan
+            Rute API kecil namun terdefinisi (app1, app2, users, status) membuat deployment otomatis tetap ringan dan
             terprediksi.
           </p>
         </article>
         <article>
           <h4>Interface</h4>
           <p>
-            Layout responsif menggunakan glassmorphism dan tipografi modern demi estetik profesional ala trend Gez Z.
+            Layout responsif menggunakan glassmorphism dan tipografi modern demi estetika profesional ala tren
+            desain saat ini.
           </p>
         </article>
       </section>
 
       <footer class="footer-note">
-        <p>Dirancang untuk DevOps Indonesia • Bersih, modern, dan siap audit SonarQube.</p>
+        <p>Dirancang untuk DevOps Indonesia — bersih, modern, dan siap audit SonarQube.</p>
       </footer>
     </main>
+    <script src="./scripts/app.js" defer></script>
   </body>
 </html>
