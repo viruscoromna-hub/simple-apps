@@ -70,5 +70,3 @@ app.listen(port, () => {
 
 module.exports = app;
 
-
-<h1>ok</h1>
