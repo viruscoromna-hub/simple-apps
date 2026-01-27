@@ -1,9 +1,8 @@
-const moment = require('moment');
-
 // Logging
 const logger = (req, res, next) => {
-    console.log(`${req.protocol}://${req.get('host')}${req.originalUrl}: ${moment().format()}`);
+    const timestamp = new Date().toISOString();
+    console.info(`[${timestamp}] ${req.method} ${req.protocol}://${req.get('host')}${req.originalUrl}`);
     next();
-}  
+};
 
-module.exports = logger
+module.exports = logger;

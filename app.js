@@ -1,36 +1,59 @@
-const express = require('express')
-const mysql = require('mysql');
-const app = express()
-const path = require('path')
+const express = require('express');
+const helmet = require('helmet');
+const path = require('path');
 require('dotenv').config();
 
-// Import Middleware
-const logger = require('./middleware/logger')
-app.use(logger)
-const connection = require('./middleware/db_connect');
+const logger = require('./middleware/logger');
+const pool = require('./middleware/db_connect');
 
-app.disable("x-powered-by");
+const requiredEnv = ['APP_PORT', 'DB_HOST', 'DB_USER', 'DB_PASS', 'DB_NAME'];
+requiredEnv.forEach((variable) => {
+  if (!process.env[variable]) {
+    console.warn(`Environment variable ${variable} is not set`);
+  }
+});
 
-// Dashboard
+const app = express();
+const port = Number(process.env.APP_PORT) || 3000;
+
+app.disable('x-powered-by');
+app.use(helmet());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(logger);
+
 app.use('/', express.static(path.join(__dirname, 'public')));
 
 app.get('/app1', (req, res) => {
-  res.send('Hello this Apps 1!')
+  res.json({ message: 'Hello this Apps 1!' });
 });
 
 app.get('/app2', (req, res) => {
-  res.send('Hello this App 2!')
+  res.json({ message: 'Hello this App 2!' });
 });
 
 app.get('/users', (req, res, next) => {
-  const sql = "SELECT * FROM tb_data ORDER BY id desc"
-  connection.query(sql,(error, fields) => {
-      res.send(fields)
-  })
+  const sql = 'SELECT * FROM tb_data ORDER BY id DESC';
+  pool.query(sql, (error, results) => {
+    if (error) {
+      return next(error);
+    }
+
+    res.json(results);
+  });
 });
 
-app.listen(process.env.APP_PORT, () => {
-  console.log(`Example app listening on port ${process.env.APP_PORT}`)
-})
+app.use((req, res) => {
+  res.status(404).json({ message: 'Resource not found' });
+});
 
-module.exports = app
+app.use((error, req, res, _next) => {
+  console.error(error);
+  res.status(500).json({ message: 'Internal server error' });
+});
+
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
+
+module.exports = app;
