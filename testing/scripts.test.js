@@ -8,6 +8,7 @@ describe('frontend script', () => {
     dom = new JSDOM(
       '<!DOCTYPE html><body>' +
         '<article class="api-card" data-endpoint="/app1"><p class="value"></p><p class="note"></p></article>' +
+        '<article class="api-card" data-endpoint="/app2"><p class="value"></p><p class="note"></p></article>' +
         '<article class="api-card" data-endpoint="/status"><p class="value"></p><p class="note"></p></article>' +
         '</body>',
       { url: 'http://localhost' }
@@ -17,6 +18,7 @@ describe('frontend script', () => {
     global.navigator = dom.window.navigator;
     globalThis.window = dom.window;
     globalThis.document = dom.window.document;
+    global.window.addEventListener = jest.fn();
   };
 
   const teardownDom = () => {
@@ -59,6 +61,30 @@ describe('frontend script', () => {
     await scriptModule.updateCard(card);
     expect(card.querySelector('.value').textContent).toBe('hello');
     expect(card.dataset.state).toBe('success');
+  });
+
+  it('falls back when fetch isn’t ok', async () => {
+    global.fetch.mockImplementationOnce(() =>
+      Promise.resolve({
+        ok: false,
+        status: 503,
+      })
+    );
+    const warningSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const card = document.querySelector('[data-endpoint="/app2"]');
+    await scriptModule.updateCard(card);
+    expect(card.dataset.state).toBe('error');
+    expect(card.querySelector('.value').textContent).toBe('Hello this App 2!');
+    warningSpy.mockRestore();
+  });
+
+  it('returns early when a card lacks required nodes', async () => {
+    const card = document.createElement('article');
+    card.dataset.endpoint = '/app1';
+    document.body.append(card);
+    global.fetch.mockClear();
+    await scriptModule.updateCard(card);
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 
   it('schedules repeated updates when kickoff runs', () => {
