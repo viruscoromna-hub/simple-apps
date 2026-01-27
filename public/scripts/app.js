@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 const fallbackMessages = {
   '/app1': 'Hello this Apps 1!',
   '/app2': 'Hello this App 2!',

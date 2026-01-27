@@ -1,7 +1,18 @@
 const app = require('./app');
 
-const port = Number(process.env.APP_PORT) || 3000;
+function getPort() {
+  return Number(process.env.APP_PORT) || 3000;
+}
 
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
+const start = () => {
+  const port = getPort();
+  const server = app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+  });
+  return server;
+};
+
+module.exports = {
+  start,
+  getPort,
+};
