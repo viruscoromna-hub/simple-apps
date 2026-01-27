@@ -78,24 +78,22 @@ describe('frontend script', () => {
     warningSpy.mockRestore();
   });
 
-  it('formats uptime/metadata for /status responses', async () => {
+  it('renders JSONified payload when message missing', async () => {
     global.fetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
         json: () =>
           Promise.resolve({
-            uptime: 37.4,
+            uptime: 42,
             status: 'ok',
-            version: '1.2.3',
-            env: 'test',
           }),
       })
     );
     const statusCard = document.querySelector('[data-endpoint="/status"]');
     await scriptModule.updateCard(statusCard);
     expect(statusCard.dataset.state).toBe('success');
-    expect(statusCard.querySelector('.value').textContent).toMatch(/uptime 37s/);
-    expect(statusCard.querySelector('.note').textContent).toContain('Versi 1.2.3');
+    expect(statusCard.querySelector('.value').textContent).toContain('"uptime":42');
+    expect(statusCard.querySelector('.note').textContent).toBe('Respons valid dari layanan.');
   });
 
   it('returns early when a card lacks required nodes', async () => {

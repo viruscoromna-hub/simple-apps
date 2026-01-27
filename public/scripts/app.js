@@ -22,21 +22,15 @@ const updateCard = async (card) => {
   value.textContent = 'Memuat…';
   note.textContent = 'Menghubungkan ke endpoint…';
 
-  try {
-    const payload = await fetchJson(endpoint);
-    if (endpoint === '/status') {
-      const uptime = Math.round(payload.uptime ?? 0);
-      value.textContent = `uptime ${uptime}s · ${payload.status ?? 'ok'}`;
-      note.textContent = `Versi ${payload.version ?? '–'} · ${payload.env ?? 'dev'}`;
-    } else {
+    try {
+      const payload = await fetchJson(endpoint);
       const message =
         payload.message ||
         (typeof payload === 'string' ? payload : JSON.stringify(payload, null, 0));
       value.textContent = message;
       note.textContent = 'Respons valid dari layanan.';
-    }
-    card.dataset.state = 'success';
-  } catch (error) {
+      card.dataset.state = 'success';
+    } catch (error) {
     value.textContent = fallbackMessages[endpoint] ?? 'Server tidak tersedia';
     note.textContent = 'Menampilkan data lokal sementara.';
     card.dataset.state = 'error';
