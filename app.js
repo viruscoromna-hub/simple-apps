@@ -89,6 +89,10 @@ app.get('/users', (req, res, next) => {
   });
 });
 
+if (process.env.NODE_ENV === 'test') {
+  app.get('/__error', (_req, _res, next) => next(new Error('boom')));
+}
+
 app.use((req, res) => {
   res.status(404).json({ message: 'Resource not found' });
 });
@@ -98,9 +102,16 @@ app.use((error, req, res, _next) => {
   res.status(500).json({ message: 'Internal server error' });
 });
 
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
+const start = () => {
+  app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+  });
+};
 
+if (require.main === module) {
+  start();
+}
+
+app.releaseInfo = releaseInfo;
 module.exports = app;
 
