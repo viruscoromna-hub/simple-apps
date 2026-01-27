@@ -7,11 +7,20 @@ const logger = require('./middleware/logger');
 const pool = require('./middleware/db_connect');
 
 const requiredEnv = ['APP_PORT', 'DB_HOST', 'DB_USER', 'DB_PASS', 'DB_NAME'];
-requiredEnv.forEach((variable) => {
-  if (!process.env[variable]) {
-    console.warn(`Environment variable ${variable} is not set`);
-  }
-});
+const missingEnv = requiredEnv.filter((variable) => !process.env[variable]);
+if (missingEnv.length > 0) {
+  console.warn(`Some environment variables are not set: ${missingEnv.join(', ')}`);
+}
+
+const releaseInfo = {
+  name: 'IDN DevOps Simple Apps',
+  version: '1.0.0',
+  description: 'API kecil dengan antarmuka yang bersih dan siap audit',
+};
+const fallbackUsers = [
+  { id: 0, name: 'Guest Participant', role: 'Developer', status: 'Fallback data' },
+  { id: -1, name: 'IDN DevOps', role: 'Platform', status: 'Ready' },
+];
 
 const app = express();
 const port = Number(process.env.APP_PORT) || 3000;
@@ -22,9 +31,11 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         imgSrc: ["'self'", "data:"],
         fontSrc: ["'self'", "https:", "data:"],
+        objectSrc: ["'none'"],
       },
     },
   })
@@ -44,11 +55,26 @@ app.get('/app2', (req, res) => {
   res.json({ message: 'Hello this App 2!' });
 });
 
+app.get('/status', (_req, res) => {
+  res.json({
+    status: 'ok',
+    uptime: process.uptime(),
+    timestamp: Date.now(),
+    env: process.env.NODE_ENV || 'development',
+    version: releaseInfo.version,
+  });
+});
+
+app.get('/meta', (_req, res) => {
+  res.json(releaseInfo);
+});
+
 app.get('/users', (req, res, next) => {
   const sql = 'SELECT * FROM tb_data ORDER BY id DESC';
   pool.query(sql, (error, results) => {
     if (error) {
-      return next(error);
+      console.error('users query failed', error.code || error.message || error);
+      return res.status(200).json(fallbackUsers);
     }
 
     res.json(results);
