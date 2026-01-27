@@ -17,7 +17,19 @@ const app = express();
 const port = Number(process.env.APP_PORT) || 3000;
 
 app.disable('x-powered-by');
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:"],
+        fontSrc: ["'self'", "https:", "data:"],
+      },
+    },
+  })
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(logger);
