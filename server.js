@@ -1,7 +1,7 @@
 const app = require('./app');
 
 function getPort() {
-  return Number(process.env.APP_PORT) || 3000;
+  return Number(process.env.APP_PORT) || 7050;
 }
 
 const start = () => {
