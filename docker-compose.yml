@@ -1,15 +1,54 @@
-version: '3.9'
-
+version: "3.9"
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+
+  backend:
+    build: ./apps
+    restart: always
+    links:
+      - db
     ports:
-      - "3000:3000"
-    restart: unless-stopped
+      - "3000"
     environment:
-      - NODE_ENV=production
-    # Uncomment and adjust the following line if you keep an .env in the repo
-    # env_file:
-    #   - .env
+      - DB_NAME=training
+      - DB_HOST=db
+      - DB_USER=peserta
+      - DB_PASS=password
+      - APP_PORT=3000
+    volumes:
+      - app-data:/app/public/images
+
+  db:
+    image: "mariadb"
+    restart: always
+    links:
+      - phpmyadmin
+    ports:
+      - "3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=training
+      - MYSQL_USER=peserta
+      - MYSQL_PASSWORD=password
+    volumes:
+      - ./apps/database/:/docker-entrypoint-initdb.d
+      - db-data:/var/lib/mysql
+
+  phpmyadmin:
+    image: "phpmyadmin"
+    restart: always
+    ports:
+      - "6080:80"
+    environment:
+      - PMA_HOST=db
+
+  web:
+    build: ./nginx
+    restart: always
+    ports:
+    - "80:80"
+    depends_on:
+    - backend
+
+volumes:
+  app-data:
+  db-data:
