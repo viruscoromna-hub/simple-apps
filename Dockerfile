@@ -10,7 +10,7 @@ RUN npm ci --omit=dev
 COPY . .
 
 # Expose the application port
-EXPOSE 7050
+EXPOSE 3000
 
 # Set NODE_ENV default to production unless overridden
 ENV NODE_ENV=production
