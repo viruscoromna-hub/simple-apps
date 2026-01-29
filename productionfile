@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+
+    environment {
+        PATH = "/usr/local/bin:/usr/bin:/bin:${env.PATH}"
+    }
+
+    stages {
+        stage('Checkout SCM') {
+            steps {
+                git branch: 'production',
+                    url: 'https://github.com/viruscoromna-hub/simple-apps.git'
+            }
+        }
+
+        stage('Deploy compose') {
+            steps {
+                sh '''
+                docker compose build
+                docker compose up -d
+                '''
+            }
+        }
+    }
+}
